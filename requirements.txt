@@ -1,3 +1,5 @@
 pyliteconf~=0.0.4
 fastapi~=0.83.0
 uvicorn~=0.18.3
+SQLAlchemy~=1.4.41
+pydantic~=1.10.2
