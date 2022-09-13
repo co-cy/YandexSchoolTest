@@ -11,7 +11,7 @@ class SystemItemType(str, Enum):
 class SystemItem(BaseModel):
     id: str
     url: str | None
-    parentID: str | None
+    parentId: str | None
     size: int
     type: SystemItemType
 

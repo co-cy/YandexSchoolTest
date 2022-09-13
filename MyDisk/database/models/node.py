@@ -9,8 +9,8 @@ class Node(Base):
 
     id = Column(String, primary_key=True, unique=True, index=True, nullable=False)
 
-    parentID = Column(String, ForeignKey("node.id"), default=None, nullable=True)
-    children = relationship("Node", cascade="all, delete")
+    parentId = Column(String, ForeignKey("node.id"), default=None, nullable=True)
+    children: list = relationship("Node", cascade="all, delete")
 
     type = Column(String(32), nullable=False)
 
@@ -18,3 +18,18 @@ class Node(Base):
     size = Column(Integer, default=None, nullable=True)
 
     date = Column(DateTime, nullable=False, index=True)
+
+    def json(self) -> dict:
+        json = {
+            "id": self.id,
+            "parentId": self.parentId,
+            "type": self.type,
+            "url": self.url,
+            "size": self.size,
+            "date": self.date
+        }
+
+        if self.children:
+            json["children"] = [child.json() for child in self.children]
+
+        return json

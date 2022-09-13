@@ -14,6 +14,7 @@ def imports(body: SystemItemImportRequest, db_session=Depends(get_db)):
     date = datetime.strptime(body.updateDate, "%Y-%m-%dT%H:%M:%S.%fZ")
 
     for item in body.items:
+        print(item.dict())
         new_node = Node(**item.dict(), date=date)
         db_session.merge(new_node)
     db_session.commit()
