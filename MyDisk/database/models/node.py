@@ -7,7 +7,7 @@ from MyDisk.database import Base
 class Node(Base):
     __tablename__ = "node"
 
-    id = Column(String, primary_key=True, unique=True, index=True, nullable=False)
+    id = Column(String(256), primary_key=True, unique=True, index=True, nullable=False)
 
     parentId = Column(String, ForeignKey("node.id"), default=None, nullable=True)
     children: list = relationship("Node", cascade="all, delete")
