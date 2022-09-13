@@ -1,5 +1,7 @@
-from datetime import datetime
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
+from fastapi import status
+
 
 from MyDisk.schemas import SystemItemImportRequest
 from MyDisk.database.models.node import Node
@@ -11,12 +13,12 @@ router = APIRouter()
 
 @router.post("/imports")
 def imports(body: SystemItemImportRequest, db_session=Depends(get_db)):
-    date = datetime.strptime(body.updateDate, "%Y-%m-%dT%H:%M:%S.%fZ")
-
     for item in body.items:
-        print(item.dict())
-        new_node = Node(**item.dict(), date=date)
+        new_node = Node(**item.dict(), date=body.updateDate)
         db_session.merge(new_node)
     db_session.commit()
 
-    return "OK"
+    return JSONResponse(status_code=200, content={
+        "code": status.HTTP_200_OK,
+        "message": "Вставка или обновление прошли успешно."
+    })
