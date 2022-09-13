@@ -14,7 +14,7 @@ router = APIRouter()
 def delete(node_id: str, date: str, db_session=Depends(get_db)):
 
     try:
-        datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
     except Exception:
         raise RequestValidationError("Bad date")
 

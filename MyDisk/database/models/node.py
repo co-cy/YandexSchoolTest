@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
+from MyDisk.schemas.item_type import SystemItemType
 from MyDisk.database import Base
 
 
@@ -29,7 +30,7 @@ class Node(Base):
             "date": self.date
         }
 
-        if self.children:
+        if self.type == SystemItemType.folder:
             json["children"] = [child.json() for child in self.children]
 
         return json

@@ -1,13 +1,8 @@
 from pydantic import BaseModel, validator, root_validator
+from MyDisk.schemas.item_type import SystemItemType
 from MyDisk.database.models.node import Node
 from MyDisk.database import get_db
 from datetime import datetime
-from enum import Enum
-
-
-class SystemItemType(str, Enum):
-    file = "FILE"
-    folder = "FOLDER"
 
 
 class SystemItem(BaseModel):
@@ -81,7 +76,7 @@ class SystemItemImportRequest(BaseModel):
     @validator("updateDate", pre=True)
     def validate_update_date(cls, var):
         if isinstance(var, str):
-            return datetime.strptime(var, "%Y-%m-%dT%H:%M:%S.%fZ")
+            return datetime.strptime(var, "%Y-%m-%dT%H:%M:%SZ")
         else:
             raise TypeError("Incorrect time format")
 
