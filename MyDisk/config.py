@@ -20,3 +20,7 @@ class SQLAlchemyConfig(_Config):
 
     # {_user}:{_password}@
     url = f"{_drivers}:///{_db}"
+
+
+class TimeConfig:
+    time_format = "%Y-%m-%dT%H:%M:%SZ"

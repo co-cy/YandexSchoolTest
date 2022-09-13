@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from MyDisk.schemas.item_type import SystemItemType
 from MyDisk.database import Base
+from MyDisk.config import TimeConfig
 
 
 class Node(Base):
@@ -24,10 +25,11 @@ class Node(Base):
         json = {
             "id": self.id,
             "parentId": self.parentId,
+            "children": None,
             "type": self.type,
             "url": self.url,
             "size": self.size,
-            "date": self.date
+            "date": self.date.strftime(TimeConfig.time_format)
         }
 
         if self.type == SystemItemType.folder:

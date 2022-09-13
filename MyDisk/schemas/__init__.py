@@ -1,6 +1,8 @@
 from pydantic import BaseModel, validator, root_validator
+
 from MyDisk.schemas.item_type import SystemItemType
 from MyDisk.database.models.node import Node
+from MyDisk.config import TimeConfig
 from MyDisk.database import get_db
 from datetime import datetime
 
@@ -32,19 +34,6 @@ class SystemItem(BaseModel):
 
         return values
 
-    @validator("parentId")
-    def validate_parent_id(cls, var: str | None):
-        if var is not None:
-            for session in get_db():
-                node = session.query(Node).get(var)
-                if not node:
-                    raise ValueError("The parent is not found")
-
-                if node.type != SystemItemType.folder:
-                    raise ValueError("The parent is not a folder")
-
-        return var
-
     @root_validator  # validate for size
     def validate_size(cls, values):
         var: int | None = values.get("size")
@@ -69,14 +58,37 @@ class SystemItemImportRequest(BaseModel):
 
     @validator("items")
     def validate_items(cls, var: list[SystemItemImport]):
-        if len(set(map(lambda x: x.id, var))) != len(var):
-            raise ValueError("The id of each element is unique among the other elements")
+        dict_id: dict[str, SystemItemType] = {}
+
+        # Checking for duplicate ID
+        for item in var:
+            if dict_id.get(item.id):
+                raise ValueError("The id of each element is unique among the other elements")
+            else:
+                dict_id[item.id] = item.type
+
+        for item in var:
+            if item.parentId:
+                if item.id == item.parentId:
+                    raise ValueError("A parent can't be himself")
+                print(dict_id, item.parentId)
+                if dict_id.get(item.parentId):
+                    if dict_id.get(item.parentId) != SystemItemType.folder:
+                        raise ValueError("The parent is not a folder")
+                else:
+                    for session in get_db():
+                        node = session.query(Node).get(item.parentId)
+                        if not node:
+                            raise ValueError("The parent is not found")
+
+                        if node.type != SystemItemType.folder:
+                            raise ValueError("The parent is not a folder")
         return var
 
     @validator("updateDate", pre=True)
     def validate_update_date(cls, var):
         if isinstance(var, str):
-            return datetime.strptime(var, "%Y-%m-%dT%H:%M:%SZ")
+            return datetime.strptime(var, TimeConfig.time_format)
         else:
             raise TypeError("Incorrect time format")
 

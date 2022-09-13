@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime
 
 from MyDisk.database.models.node import Node
+from MyDisk.config import TimeConfig
 from MyDisk.database import get_db
 
 
@@ -14,7 +15,7 @@ router = APIRouter()
 def delete(node_id: str, date: str, db_session=Depends(get_db)):
 
     try:
-        datetime.strptime(date, "%Y-%m-%dT%H:%M:%SZ")
+        datetime.strptime(date, TimeConfig.time_format)
     except Exception:
         raise RequestValidationError("Bad date")
 
