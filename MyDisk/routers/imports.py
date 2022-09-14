@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends
 from fastapi import status
 
 
 from MyDisk.schemas import SystemItemImportRequest
+from MyDisk.helper import datetime_is_correct
 from MyDisk.database.models.node import Node
 from MyDisk.database import get_db
 
@@ -14,8 +15,10 @@ router = APIRouter()
 @router.post("/imports")
 def imports(body: SystemItemImportRequest, db_session=Depends(get_db)):
     list_update: list[tuple[str, int]] = []
+
+    date = datetime_is_correct(body.updateDate)
     for item in body.items:
-        new_node = Node(**item.dict(), date=body.updateDate)
+        new_node = Node(**item.dict(), date_string=body.updateDate, date=date)
 
         node: Node = db_session.query(Node).get(item.id)
         if node:
@@ -24,7 +27,6 @@ def imports(body: SystemItemImportRequest, db_session=Depends(get_db)):
             else:
                 list_update.append((item.parentId, item.size))
                 list_update.append((node.parentId, -node.size))
-            print(list_update)
         elif item.parentId:
             list_update.append((item.parentId, item.size))
 
@@ -34,11 +36,11 @@ def imports(body: SystemItemImportRequest, db_session=Depends(get_db)):
     for parent_id, add_size in list_update:
         parent: Node = db_session.query(Node).get(parent_id)
         if parent.parentId:
-            print("parent", parent.id, "PARENT ID", parent.parentId)
             list_update.append((parent.parentId, add_size))
 
         parent.size += add_size
-        parent.date = body.updateDate
+        parent.date_string = body.updateDate
+        parent.date = date
 
         db_session.add(parent)
     db_session.commit()

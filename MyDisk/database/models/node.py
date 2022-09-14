@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from MyDisk.schemas.item_type import SystemItemType
@@ -18,7 +18,8 @@ class Node(Base):
     url = Column(String(255), default=None, nullable=True)
     size = Column(Integer, default=0, nullable=False)
 
-    date = Column(String(64), nullable=False, index=True)
+    date_string = Column(String(64), nullable=False)
+    date = Column(DateTime, nullable=False, index=True)
 
     def json(self) -> dict:
         json = {
@@ -28,7 +29,7 @@ class Node(Base):
             "type": self.type,
             "url": self.url,
             "size": self.size,
-            "date": self.date
+            "date": self.date_string
         }
 
         if self.type == SystemItemType.folder:

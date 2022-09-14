@@ -1,18 +1,20 @@
-from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import RequestValidationError
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
-from MyDisk.database import get_db
-from MyDisk.database.models.node import Node
 from MyDisk.helper import datetime_is_correct
+from MyDisk.database.models.node import Node
+from MyDisk.database import get_db
 
 router = APIRouter()
 
 
 @router.delete("/delete/{node_id}")
-def delete(node_id: str, date: str, db_session=Depends(get_db)):
-    if not datetime_is_correct(date):
-        raise RequestValidationError("Bad date")
+def delete(node_id: str, date_string: str, db_session=Depends(get_db)):
+
+    date = datetime_is_correct(date_string)
+    if not date:
+        raise RequestValidationError("Bad date_string")
 
     node = db_session.query(Node).get(node_id)
     if not node:
@@ -29,6 +31,7 @@ def delete(node_id: str, date: str, db_session=Depends(get_db)):
                 list_parent.append(parent.parentId)
 
             parent.size -= node.size
+            parent.date_string = date_string
             parent.date = date
 
             db_session.add(parent)
