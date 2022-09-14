@@ -42,9 +42,11 @@ class SystemItem(BaseModel):
         if item_type == SystemItemType.folder:
             if var is not None:
                 raise ValueError("The size field should always be null when importing a folder")
+            values["size"] = 0
         elif item_type == SystemItemType.file:
             if var <= 0:
                 raise ValueError("The size field for files must always be greater than 0")
+
         return values
 
 

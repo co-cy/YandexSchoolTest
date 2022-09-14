@@ -16,7 +16,7 @@ class Node(Base):
     type = Column(String(32), nullable=False)
 
     url = Column(String(255), default=None, nullable=True)
-    size = Column(Integer, default=None, nullable=True)
+    size = Column(Integer, default=0, nullable=False)
 
     date = Column(String(48), nullable=False, index=True)
 
