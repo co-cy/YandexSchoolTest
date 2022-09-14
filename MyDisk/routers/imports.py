@@ -13,10 +13,34 @@ router = APIRouter()
 
 @router.post("/imports")
 def imports(body: SystemItemImportRequest, db_session=Depends(get_db)):
-    # TODO: При изменении надо вызывть рекурсивное обновление всех родителей и обновлять их вес и дату
+    list_update: list[tuple[str, int]] = []
     for item in body.items:
         new_node = Node(**item.dict(), date=body.updateDate)
+
+        node: Node = db_session.query(Node).get(item.id)
+        if node:
+            if node.parentId == item.parentId:
+                list_update.append((item.parentId, item.size - node.size))
+            else:
+                list_update.append((item.parentId, item.size))
+                list_update.append((node.parentId, -node.size))
+            print(list_update)
+        elif item.parentId:
+            list_update.append((item.parentId, item.size))
+
         db_session.merge(new_node)
+    db_session.commit()
+
+    for parent_id, add_size in list_update:
+        parent: Node = db_session.query(Node).get(parent_id)
+        if parent.parentId:
+            print("parent", parent.id, "PARENT ID", parent.parentId)
+            list_update.append((parent.parentId, add_size))
+
+        parent.size += add_size
+        parent.date = body.updateDate
+
+        db_session.add(parent)
     db_session.commit()
 
     return JSONResponse(status_code=200, content={

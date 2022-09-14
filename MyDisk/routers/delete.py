@@ -11,7 +11,6 @@ router = APIRouter()
 
 @router.delete("/delete/{node_id}")
 def delete(node_id: str, date: str, db_session=Depends(get_db)):
-    # TODO: При удалении надо вызывть рекурсивное обновление всех родителей и обновлять их вес и дату
     if not datetime_is_correct(date):
         raise RequestValidationError("Bad date")
 
@@ -22,6 +21,17 @@ def delete(node_id: str, date: str, db_session=Depends(get_db)):
             "message": "Item not found"
         })
 
+    if node.parentId:
+        list_parent = [node.parentId]
+        for parent_id in list_parent:
+            parent: Node = db_session.query(Node).get(parent_id)
+            if parent.parentId:
+                list_parent.append(parent.parentId)
+
+            parent.size -= node.size
+            parent.date = date
+
+            db_session.add(parent)
     db_session.delete(node)
     db_session.commit()
 
