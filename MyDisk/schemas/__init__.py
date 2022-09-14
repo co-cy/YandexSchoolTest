@@ -1,8 +1,8 @@
 from pydantic import BaseModel, validator, root_validator
 
 from MyDisk.schemas.item_type import SystemItemType
+from MyDisk.helper import datetime_is_correct
 from MyDisk.database.models.node import Node
-from MyDisk.config import TimeConfig
 from MyDisk.database import get_db
 from datetime import datetime
 
@@ -54,7 +54,7 @@ class SystemItemImport(SystemItem):
 
 class SystemItemImportRequest(BaseModel):
     items: list[SystemItemImport]
-    updateDate: datetime
+    updateDate: str
 
     @validator("items")
     def validate_items(cls, var: list[SystemItemImport]):
@@ -71,7 +71,7 @@ class SystemItemImportRequest(BaseModel):
             if item.parentId:
                 if item.id == item.parentId:
                     raise ValueError("A parent can't be himself")
-                print(dict_id, item.parentId)
+
                 if dict_id.get(item.parentId):
                     if dict_id.get(item.parentId) != SystemItemType.folder:
                         raise ValueError("The parent is not a folder")
@@ -87,10 +87,10 @@ class SystemItemImportRequest(BaseModel):
 
     @validator("updateDate", pre=True)
     def validate_update_date(cls, var):
-        if isinstance(var, str):
-            return datetime.strptime(var, TimeConfig.time_format)
+        if isinstance(var, str) and datetime_is_correct(var):
+            return var
         else:
-            raise TypeError("Incorrect time format")
+            raise TypeError("Incorrect time format or type")
 
 
 class SystemItemHistoryUnit(SystemItemImport):

@@ -1,22 +1,18 @@
-from fastapi.exceptions import RequestValidationError
 from fastapi import APIRouter, Depends, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from datetime import datetime
 
-from MyDisk.database.models.node import Node
-from MyDisk.config import TimeConfig
 from MyDisk.database import get_db
-
+from MyDisk.database.models.node import Node
+from MyDisk.helper import datetime_is_correct
 
 router = APIRouter()
 
 
 @router.delete("/delete/{node_id}")
 def delete(node_id: str, date: str, db_session=Depends(get_db)):
-
-    try:
-        datetime.strptime(date, TimeConfig.time_format)
-    except Exception:
+    # TODO: При удалении надо вызывть рекурсивное обновление всех родителей и обновлять их вес и дату
+    if not datetime_is_correct(date):
         raise RequestValidationError("Bad date")
 
     node = db_session.query(Node).get(node_id)

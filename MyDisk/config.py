@@ -23,4 +23,9 @@ class SQLAlchemyConfig(_Config):
 
 
 class TimeConfig:
-    time_format = "%Y-%m-%dT%H:%M:%SZ"
+    # TODO: Определиться с форматом времени
+
+    time_format: list[str] = [
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%dT%H:%M:%S.%fZ"
+    ]

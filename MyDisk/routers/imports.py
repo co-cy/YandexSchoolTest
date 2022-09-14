@@ -13,6 +13,7 @@ router = APIRouter()
 
 @router.post("/imports")
 def imports(body: SystemItemImportRequest, db_session=Depends(get_db)):
+    # TODO: При изменении надо вызывть рекурсивное обновление всех родителей и обновлять их вес и дату
     for item in body.items:
         new_node = Node(**item.dict(), date=body.updateDate)
         db_session.merge(new_node)
