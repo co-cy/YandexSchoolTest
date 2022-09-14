@@ -20,12 +20,3 @@ class SQLAlchemyConfig(_Config):
 
     # {_user}:{_password}@
     url = f"{_drivers}:///{_db}"
-
-
-class TimeConfig:
-    # TODO: Определиться с форматом времени
-
-    time_format: list[str] = [
-        "%Y-%m-%dT%H:%M:%SZ",
-        "%Y-%m-%dT%H:%M:%S.%fZ"
-    ]

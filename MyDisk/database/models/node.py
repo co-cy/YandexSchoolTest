@@ -13,12 +13,12 @@ class Node(Base):
     parentId = Column(String, ForeignKey("node.id"), default=None, nullable=True)
     children: list = relationship("Node", cascade="all, delete")
 
-    type = Column(String(32), nullable=False)
+    type = Column(String(32), index=True, nullable=False)
 
     url = Column(String(255), default=None, nullable=True)
     size = Column(Integer, default=0, nullable=False)
 
-    date = Column(String(48), nullable=False, index=True)
+    date = Column(String(64), nullable=False, index=True)
 
     def json(self) -> dict:
         json = {
