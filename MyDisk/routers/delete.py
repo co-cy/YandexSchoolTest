@@ -10,10 +10,10 @@ router = APIRouter()
 
 
 @router.delete("/delete/{node_id}")
-def delete(node_id: str, date_string: str, db_session=Depends(get_db)):
+def delete(node_id: str, date: str, db_session=Depends(get_db)):
 
-    date = str_to_datetime(date_string)
-    if not date:
+    date_datetime = str_to_datetime(date)
+    if not date_datetime:
         raise RequestValidationError("Bad date_string")
 
     node = db_session.query(Node).get(node_id)
@@ -31,8 +31,8 @@ def delete(node_id: str, date_string: str, db_session=Depends(get_db)):
                 list_parent.append(parent.parentId)
 
             parent.size -= node.size
-            parent.date_string = date_string
-            parent.date = date
+            parent.date_string = date
+            parent.date = date_datetime
 
             db_session.add(parent)
     db_session.delete(node)
