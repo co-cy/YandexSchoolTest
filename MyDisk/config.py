@@ -1,4 +1,5 @@
 from pyliteconf import Config as _Config
+from os import getenv
 
 
 class FastApiConfig(_Config):
@@ -13,10 +14,9 @@ class SQLAlchemyConfig(_Config):
     Класс с описанием конфигурации для SQLAlchemy
     """
 
-    _drivers = "sqlite"
-    # _user = ""
-    # _password = ""
-    _db = "sqlite3.db"
+    _drivers = getenv("DB_DRIVER")
+    _user = getenv("DB_USER")
+    _password = getenv("DB_PASSWORD")
+    _db = getenv("DB_URL")
 
-    # {_user}:{_password}@
-    url = f"{_drivers}:///{_db}"
+    url = f"{_drivers}://{_user}:{_password}@{_db}"
