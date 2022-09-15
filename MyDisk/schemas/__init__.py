@@ -1,7 +1,7 @@
 from pydantic import BaseModel, validator, root_validator
 
 from MyDisk.schemas.item_type import SystemItemType
-from MyDisk.helper import datetime_is_correct
+from MyDisk.helper import str_to_datetime
 from MyDisk.database.models.node import Node
 from MyDisk.database import get_db
 from datetime import datetime
@@ -89,7 +89,7 @@ class SystemItemImportRequest(BaseModel):
 
     @validator("updateDate", pre=True)
     def validate_update_date(cls, var):
-        if isinstance(var, str) and datetime_is_correct(var):
+        if isinstance(var, str) and str_to_datetime(var):
             return var
         else:
             raise TypeError("Incorrect time format or type")

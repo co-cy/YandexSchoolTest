@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Depends
 from datetime import timedelta
 
-from MyDisk.helper import datetime_is_correct
+from MyDisk.helper import str_to_datetime
 from MyDisk.database.models.node import Node
 from MyDisk.database import get_db
 
@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("/updates")
 def updates(date: str, db_session=Depends(get_db)):
-    datetime = datetime_is_correct(date)
+    datetime = str_to_datetime(date)
     if not datetime:
         raise RequestValidationError("Bad date_string")
 

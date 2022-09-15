@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 
 from MyDisk.schemas.item_type import SystemItemType
+from MyDisk.helper import str_to_datetime
 from MyDisk.database import Base
 
 
@@ -36,3 +37,26 @@ class Node(Base):
             json["children"] = [child.json() for child in self.children]
 
         return json
+
+    def update(self, params: dict, date: str):
+        if self.type == SystemItemType.file:
+            if params.get("id"):
+                self.id = params.get("id")
+            if params.get("parentId"):
+                self.parentId = params.get("parentId")
+            if params.get("type"):
+                self.type = params.get("type")
+            if params.get("url"):
+                self.url = params.get("url")
+            if params.get("size"):
+                self.size = params.get("size")
+        elif self.type == SystemItemType.folder:
+            if params.get("id"):
+                self.id = params.get("id")
+            if params.get("parentId"):
+                self.parentId = params.get("parentId")
+            if params.get("type"):
+                self.type = params.get("type")
+
+        self.date = str_to_datetime(date)
+        self.date_string = date
